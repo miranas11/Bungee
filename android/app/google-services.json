@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "810450142037",
+    "firebase_url": "https://bungee-e0f77.firebaseio.com",
+    "project_id": "bungee-e0f77",
+    "storage_bucket": "bungee-e0f77.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:810450142037:android:08903a864b3000ad1d65dc",
+        "android_client_info": {
+          "package_name": "com.miranas11.Bungee"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "810450142037-9n09k8cb6rifr5uabnasqebv1vg3l73n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.miranas11.Bungee",
+            "certificate_hash": "23ed25588e2a6d60ff522a48659d6e1434c25839"
+          }
+        },
+        {
+          "client_id": "810450142037-lqfllo7g2jnudfg6id505pcojeto1p4s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDjbTRoC1_b2GEL6Bc1HDH5d_oxfyRhUuE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "810450142037-lqfllo7g2jnudfg6id505pcojeto1p4s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
