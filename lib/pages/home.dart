@@ -33,6 +33,7 @@ class _HomeState extends State<Home> {
     //sign in for first time
     googleSignIn.onCurrentUserChanged.listen(
       (account) {
+        print('login');
         handleSignIn(account);
       },
       onError: (error) {
@@ -42,6 +43,7 @@ class _HomeState extends State<Home> {
     //reauthenticate sign in when app restart
     googleSignIn.signInSilently(suppressErrors: false).then(
       (account) {
+        print('silently');
         handleSignIn(account);
       },
       onError: (error) {
@@ -76,18 +78,21 @@ class _HomeState extends State<Home> {
     if (!userdoc.exists) {
       final username = await Navigator.pushNamed(context, CreateAccount.id);
 
-      userRef.doc(user.id).set(
-        {
-          'id': user.id,
-          'email': user.email,
-          'photo_url': user.photoUrl,
-          'username': username,
-          'display_name': user.displayName,
-          'bio': '',
-          'time_stamp': timestamp,
-        },
-      );
-      userdoc = await userRef.doc(user.id).get();
+      if (username != null) {
+        userRef.doc(user.id).set(
+          {
+            'id': user.id,
+            'email': user.email,
+            'photo_url': user.photoUrl,
+            'username': username,
+            'display_name': user.displayName,
+            'bio': '',
+            'time_stamp': timestamp,
+          },
+        );
+
+        userdoc = await userRef.doc(user.id).get();
+      }
     }
     currentUser = User.fromDocument(userdoc);
   }
@@ -98,9 +103,6 @@ class _HomeState extends State<Home> {
 
   logout() {
     googleSignIn.signOut();
-    setState(() {
-      isAuth = false;
-    });
   }
 
   onPageChanged(int newIndex) {

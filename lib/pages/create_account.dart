@@ -39,7 +39,7 @@ class _CreateAccountState extends State<CreateAccount> {
             child: TextFormField(
               autovalidate: true,
               validator: (value) {
-                if (value.trim().length < 3 || value.isEmpty) {
+                if (value.trim().length < 3 && value.length != 0) {
                   return 'username too short';
                 } else if (value.trim().length > 13) {
                   return 'username too long';
