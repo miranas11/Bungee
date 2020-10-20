@@ -19,6 +19,7 @@ dependencies:
   firebase_auth: ^0.18.1+2
   google_sign_in: ^4.5.4
   geolocator: ^6.0.0+4
+  geocoder: ^0.2.1
   uuid: ^2.2.2
   image: ^2.1.18
   animator: ^2.0.1
@@ -27,6 +28,7 @@ dependencies:
   timeago: ^2.0.27
   cached_network_image: ^2.3.2+1
   flutter_svg: ^0.19.0
+
 
 dev_dependencies:
   flutter_test:

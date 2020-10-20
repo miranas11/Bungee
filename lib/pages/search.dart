@@ -36,6 +36,7 @@ class _SearchState extends State<Search> {
         onFieldSubmitted: searchUsers,
         textAlignVertical: TextAlignVertical.center,
         decoration: InputDecoration(
+          border: InputBorder.none,
           hintText: 'Search...',
           prefixIcon: Icon(
             Icons.account_box,

@@ -1,4 +1,5 @@
 import 'package:Bungee/pages/create_account.dart';
+import 'package:Bungee/pages/edit_profile.dart';
 import 'package:Bungee/pages/home.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -17,6 +18,7 @@ class MyApp extends StatelessWidget {
       routes: {
         Home.id: (context) => Home(),
         CreateAccount.id: (context) => CreateAccount(),
+        EditProfile.id: (context) => EditProfile(),
       },
       title: 'Bungee',
       theme: ThemeData(
