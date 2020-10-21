@@ -1,8 +1,10 @@
 import 'package:Bungee/models/user.dart';
 import 'package:Bungee/pages/edit_profile.dart';
 import 'package:Bungee/widgets/header.dart';
+import 'package:Bungee/widgets/post.dart';
 import 'package:Bungee/widgets/progress.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'home.dart';
 
@@ -16,6 +18,33 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   final String currentUserId = currentUser?.id;
+  bool isLoading = false;
+  List<Post> posts = [];
+  int postCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    getProfilePosts();
+  }
+
+  getProfilePosts() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    QuerySnapshot snapshot = await postref
+        .doc(widget.profileID)
+        .collection('userposts')
+        .orderBy('timestamp', descending: true)
+        .get();
+
+    setState(() {
+      isLoading = false;
+      posts = snapshot.docs.map((e) => Post.fromDocument(e)).toList();
+      postCount = snapshot.docs.length;
+    });
+  }
 
   buildCountColumn(String label, int count) {
     return Column(
@@ -154,6 +183,15 @@ class _ProfileState extends State<Profile> {
     );
   }
 
+  buildProfilePosts() {
+    if (isLoading) {
+      return circularProgress();
+    }
+    return Column(
+      children: posts,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -161,6 +199,10 @@ class _ProfileState extends State<Profile> {
       body: ListView(
         children: <Widget>[
           buildProfileHeader(),
+          Divider(
+            height: 0,
+          ),
+          buildProfilePosts(),
         ],
       ),
     );
