@@ -37,7 +37,7 @@ class _CreateAccountState extends State<CreateAccount> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
             child: TextFormField(
-              autovalidate: true,
+              autovalidateMode: AutovalidateMode.always,
               validator: (value) {
                 if (value.trim().length < 3 && value.length != 0) {
                   return 'username too short';

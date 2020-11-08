@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:Bungee/models/user.dart';
 import 'package:Bungee/pages/comments.dart';
 import 'package:Bungee/pages/home.dart';
@@ -287,7 +286,7 @@ class _PostState extends State<Post> {
               child: Text(
                 description,
               ),
-            )
+            ),
           ],
         )
       ],
