@@ -1,5 +1,6 @@
 import 'package:Bungee/models/user.dart';
 import 'package:Bungee/pages/home.dart';
+import 'package:Bungee/pages/profile.dart';
 import 'package:Bungee/widgets/progress.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -32,6 +33,7 @@ class _SearchState extends State<Search> {
       elevation: 1,
       backgroundColor: Colors.white,
       title: TextFormField(
+        style: TextStyle(fontSize: 14),
         controller: searchController,
         onFieldSubmitted: searchUsers,
         textAlignVertical: TextAlignVertical.center,
@@ -112,22 +114,38 @@ class UserResult extends StatelessWidget {
   final User user;
   UserResult(this.user);
 
+  showProfile(context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Profile(
+          profileID: user.id,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => print(user.email),
+      onTap: () => showProfile(context),
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 10),
         child: ListTile(
+          visualDensity: VisualDensity(vertical: -2),
+          dense: true,
           leading: CircleAvatar(
             backgroundColor: Theme.of(context).primaryColor,
             backgroundImage: CachedNetworkImageProvider(user.photoUrl),
           ),
           title: Text(
             user.displayName,
-            style: TextStyle(),
+            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
           ),
-          subtitle: Text(user.username),
+          subtitle: Text(
+            user.username,
+            style: TextStyle(fontWeight: FontWeight.w500),
+          ),
         ),
       ),
     );

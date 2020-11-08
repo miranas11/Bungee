@@ -11,6 +11,7 @@ AppBar header(context,
         fontFamily: isTitle ? 'Signatra' : '',
         fontSize: isTitle ? 35.0 : 20,
       ),
+      overflow: TextOverflow.ellipsis,
     ),
     centerTitle: true,
   );

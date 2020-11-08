@@ -1,6 +1,11 @@
+import 'dart:async';
+
 import 'package:Bungee/models/user.dart';
+import 'package:Bungee/pages/comments.dart';
 import 'package:Bungee/pages/home.dart';
-import 'package:Bungee/widgets/progress.dart';
+import 'package:Bungee/pages/profile.dart';
+import 'package:Bungee/widgets/custom_image.dart';
+import 'package:animator/animator.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +42,7 @@ class Post extends StatefulWidget {
   }
 
   int getLikesCount(likes) {
-    if (likes = null) {
+    if (likes == null) {
       return 0;
     }
     int count = 0;
@@ -64,6 +69,7 @@ class Post extends StatefulWidget {
 }
 
 class _PostState extends State<Post> {
+  final String currentUserId = currentUser?.id;
   final String description;
   final String mediaUrl;
   final String location;
@@ -72,6 +78,9 @@ class _PostState extends State<Post> {
   final String username;
   int likeCount;
   Map likes;
+
+  bool isLiked;
+  bool showHeart = false;
 
   _PostState({
     this.description,
@@ -84,13 +93,24 @@ class _PostState extends State<Post> {
     this.likeCount,
   });
 
+  showProfile(context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Profile(
+          profileID: ownerId,
+        ),
+      ),
+    );
+  }
+
   buildPostHeader() {
     return FutureBuilder(
       future: userRef.doc(ownerId).get(),
       builder: (context, snapshot) {
-        // if (!snapshot.hasData) {
-        //   return circularProgress();
-        // }
+        if (!snapshot.hasData) {
+          return Container();
+        }
         User user = User.fromDocument(snapshot.data);
 
         return ListTile(
@@ -100,7 +120,7 @@ class _PostState extends State<Post> {
             backgroundColor: Colors.grey,
           ),
           title: GestureDetector(
-            onTap: () => print('open Profile'),
+            onTap: () => showProfile(context),
             child: Text(
               user.username,
               style: TextStyle(fontWeight: FontWeight.bold),
@@ -109,7 +129,7 @@ class _PostState extends State<Post> {
           subtitle: Text(location),
           trailing: Icon(
             Icons.more_vert,
-            size: 10,
+            size: 25,
           ),
         );
       },
@@ -118,17 +138,98 @@ class _PostState extends State<Post> {
 
   buildPostImage() {
     return GestureDetector(
-      onDoubleTap: () => print('like the image'),
+      onDoubleTap: handleLikes,
       child: Stack(
         alignment: Alignment.center,
         children: <Widget>[
-          Image.network(
-            mediaUrl,
-            height: 300,
-          )
+          cachedNetworkImage(mediaUrl),
+          showHeart == true
+              ? Animator(
+                  tween: Tween(begin: 0.8, end: 1.4),
+                  duration: Duration(milliseconds: 300),
+                  curve: Curves.elasticOut,
+                  cycles: 0,
+                  builder: (context, animatorState, child) => Center(
+                    child: Transform.scale(
+                      scale: animatorState.value,
+                      child: Icon(
+                        Icons.favorite,
+                        size: 50,
+                        color: Colors.red[300],
+                      ),
+                    ),
+                  ),
+                )
+              : Text(''),
         ],
       ),
     );
+  }
+
+  addliketoactivityfeed() {
+    // if (currentUserId == ownerId) {
+    //   return;
+    // }
+    activityfeedref.doc(ownerId).collection('feeditems').doc(postId).set({
+      'comment': '',
+      'mediaUrl': mediaUrl,
+      'postId': postId,
+      'timestamp': timestamp,
+      'type': 'like',
+      'userId': currentUserId,
+      'userProfileImg': currentUser.photoUrl,
+      'username': currentUser.username,
+    });
+  }
+
+  removelikefromactivityfeed() {
+    if (currentUserId == ownerId) {
+      return;
+    }
+    activityfeedref
+        .doc(ownerId)
+        .collection('feeditems')
+        .doc(postId)
+        .get()
+        .then((value) {
+      if (value.exists) {
+        value.reference.delete();
+      }
+    });
+  }
+
+  handleLikes() {
+    bool _isLiked = likes[currentUserId] == true;
+
+    if (_isLiked) {
+      postref.doc(ownerId).collection('userposts').doc(postId).update({
+        'likes.$currentUserId': false,
+      });
+      removelikefromactivityfeed();
+      setState(() {
+        likeCount -= 1;
+        isLiked = false;
+        likes[currentUserId] = false;
+      });
+    } else if (!_isLiked) {
+      postref.doc(ownerId).collection('userposts').doc(postId).update({
+        'likes.$currentUserId': true,
+      });
+
+      addliketoactivityfeed();
+      setState(() {
+        likeCount += 1;
+        isLiked = true;
+        likes[currentUserId] = true;
+        showHeart = true;
+      });
+
+      Timer(Duration(milliseconds: 500), () {
+        setState(() {
+          showHeart = false;
+        });
+      });
+    }
   }
 
   buildPostTile() {
@@ -137,18 +238,19 @@ class _PostState extends State<Post> {
       children: <Widget>[
         Row(
           children: [
-            Padding(padding: EdgeInsets.only(top: 40, left: 20)),
+            Padding(padding: EdgeInsets.only(top: 40, left: 20, bottom: 0)),
             GestureDetector(
-              onTap: () => print('liked'),
+              onTap: handleLikes,
               child: Icon(
-                Icons.favorite_border,
+                isLiked ? Icons.favorite : Icons.favorite_border,
                 size: 28,
                 color: Colors.pink,
               ),
             ),
             Padding(padding: EdgeInsets.only(right: 20)),
             GestureDetector(
-              onTap: () => print('showing comments'),
+              onTap: () => showComments(context,
+                  postId: postId, postOwnerId: ownerId, mediaUrl: mediaUrl),
               child: Icon(
                 Icons.chat,
                 size: 28,
@@ -178,6 +280,9 @@ class _PostState extends State<Post> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
+            Padding(
+              padding: EdgeInsets.only(right: 5),
+            ),
             Expanded(
               child: Text(
                 description,
@@ -191,6 +296,7 @@ class _PostState extends State<Post> {
 
   @override
   Widget build(BuildContext context) {
+    isLiked = likes[currentUserId] == true;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
@@ -200,4 +306,20 @@ class _PostState extends State<Post> {
       ],
     );
   }
+}
+
+showComments(BuildContext context,
+    {String postOwnerId, String postId, String mediaUrl}) {
+  return Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) {
+        return Comments(
+          postId: postId,
+          mediaUrl: mediaUrl,
+          postOwnerId: postOwnerId,
+        );
+      },
+    ),
+  );
 }
